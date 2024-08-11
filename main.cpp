@@ -20,8 +20,15 @@ class Player
         bool fall = false;
         bool is_jumping = false;
         bool block_jump = false;
-        int y_before_jump;
-        int max_jump_height = 300;
+        int y_before_jump = 0;
+        int max_jump_height = 250;
+        Texture2D sprite;
+};
+class Object
+{
+    public:
+        int x;
+        int y;  
         Texture2D sprite;
 };
 int main()
@@ -40,13 +47,15 @@ int main()
     player.sprite = LoadTexture("sprites/player.png");
     char playerXStr[10];
     char playerYStr[10];
-
+    Texture2D target_sprite;
+    target_sprite = LoadTexture("sprites/target.png");
     // Main game loop
     while (!WindowShouldClose())
     {
-        if (IsKeyDown(KEY_RIGHT)) player.x += player.speed;
-        if (IsKeyDown(KEY_LEFT)) player.x -= player.speed;
-        if (IsKeyDown(KEY_UP))
+        // check Key inputs
+        if (IsKeyDown(KEY_RIGHT) || (IsKeyDown(KEY_D))) player.x += player.speed;
+        if (IsKeyDown(KEY_LEFT) || (IsKeyDown(KEY_A))) player.x -= player.speed;
+        if (IsKeyDown(KEY_UP) || (IsKeyDown(KEY_W)))
         {
             if (player.block_jump != true)
             {
@@ -56,11 +65,12 @@ int main()
                 player.y_before_jump = player.y;
             }
         }
+        //Moving The player
         if(player.x >= 1100) player.x = 1100;
         if(player.x <= 10) player.x = 10;
         if(player.fall) player.y += 10;
         if (player.is_on_floor == false && player.is_jumping == false) player.fall = true;
-        if (player.is_jumping) player.y -= 10;
+        if (player.is_jumping) player.y -= 15;
         if (player.y_before_jump - player.y >= player.max_jump_height) player.is_jumping = false;
         if (player.is_on_floor == true)
         {
@@ -71,14 +81,21 @@ int main()
         {            
             player.is_on_floor = true;
         }
-        // Convert player.x to a string
+        // Convert player.x and player.y to string to show on screen
         sprintf(playerXStr, "%d", player.x);
         sprintf(playerYStr, "%d", player.y);
+        //draw the window
         BeginDrawing();
-        ClearBackground(PURPLE);
+        ClearBackground(GREEN);
+         //hide mouse and change it to target
+        int target_x = GetMouseX();
+        int target_y = GetMouseY();
+        HideCursor();
         DrawTexture(player.sprite, player.x, player.y, WHITE);
+        DrawTexture(target_sprite, target_x, target_y, WHITE);
         DrawText(playerXStr, 10, 10, 80, WHITE);
         DrawText(playerYStr, 10, 80, 80, WHITE);
+        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) DrawText("MOUSE CLICK DETECTED",10,180,80,WHITE);
         EndDrawing();
     }
 
