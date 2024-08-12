@@ -47,8 +47,12 @@ int main()
     player.sprite = LoadTexture("sprites/player.png");
     char playerXStr[10];
     char playerYStr[10];
-    Texture2D target_sprite;
-    target_sprite = LoadTexture("sprites/target.png");
+    char targetXStr[10];
+    char targetYStr[10];
+    Object target;
+    target.x = 0;
+    target.y = 0;
+    target.sprite = LoadTexture("sprites/target.png");
     Object bullet;
     bool shot_fired = false;
     int click_x = GetMouseX();
@@ -103,15 +107,24 @@ int main()
         //draw the window
         BeginDrawing();
         ClearBackground(GREEN);
-         //hide mouse and change it to target
-        int target_x = GetMouseX();
-        int target_y = GetMouseY();
+        //hide mouse and change it to target
+        target.x = GetMouseX();
+        target.y = GetMouseY();
+        sprintf(targetXStr, "%d", target.x);
+        sprintf(targetYStr, "%d", target.y);
         HideCursor();
         DrawTexture(player.sprite, player.x, player.y, WHITE);
-        DrawTexture(target_sprite, target_x, target_y, WHITE);
-        DrawText(playerXStr, 10, 10, 80, WHITE);
-        DrawText(playerYStr, 10, 80, 80, WHITE);
-        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) DrawText("MOUSE CLICK DETECTED",10,180,80,WHITE);
+        DrawTexture(target.sprite, target.x, target.y, WHITE);
+        DrawText("playerX:", 10, 10, 80, WHITE);;
+        DrawText(playerXStr, 400, 10, 80, WHITE);
+        DrawText("playerY:", 10, 90, 80, WHITE);;
+        DrawText(playerYStr, 400, 90, 80, WHITE);
+        DrawText("TargetX:", 0, 160, 80, WHITE);
+        DrawText(targetXStr, 400, 160, 80, WHITE);
+        DrawText("TargetY:", 0, 240 , 80, WHITE);
+        DrawText(targetYStr, 400, 240 , 80, WHITE);
+        DrawCircle(bullet.x,bullet.y,20,YELLOW);
+        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) DrawText("MOUSE CLICK DETECTED",10,400,80,RED);
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
             if (shot_fired == false)
@@ -133,7 +146,6 @@ int main()
                 shot_fired = false;
             }
         }
-        DrawLine(player.x,  player.y,target_x , target_y, BLACK);
         EndDrawing();
     }
 
