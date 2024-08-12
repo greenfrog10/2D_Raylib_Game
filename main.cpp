@@ -112,8 +112,8 @@ int main()
         sprintf(targetYStr, "%d", round_target_y);
         //hide mouse and change it to target
         HideCursor();
-        DrawTexture(player.sprite, player.pos.x, player.pos.y, WHITE);
-        DrawTexture(target.sprite, target.pos.x, target.pos.y, WHITE);
+        DrawTextureV(player.sprite, player.pos, WHITE);
+        DrawTextureV(target.sprite, target.pos, WHITE);
         DrawText("playerX:", 10, 10, 80, WHITE);;
         DrawText(playerXStr, 400, 10, 80, WHITE);
         DrawText("playerY:", 10, 90, 80, WHITE);;
