@@ -37,13 +37,13 @@ int main()
     window.width = 1200;
     window.height = 900;
     InitWindow(window.width, window.height,"My game");
-
+    Vector2 center{window.width / 2,window.height / 2};
     Player player;
-    player.x = window.width / 2;
-    player.y = window.height / 2;
     player.size = 60;
     player.speed = 10;
-    SetTargetFPS(60);   
+    SetTargetFPS(60);
+    player.x = window.width / 2;
+    player.y = window.height / 2;
     player.sprite = LoadTexture("sprites/player.png");
     char playerXStr[10];
     char playerYStr[10];
@@ -107,11 +107,11 @@ int main()
         //draw the window
         BeginDrawing();
         ClearBackground(GREEN);
-        //hide mouse and change it to target
         target.x = GetMouseX();
         target.y = GetMouseY();
         sprintf(targetXStr, "%d", target.x);
         sprintf(targetYStr, "%d", target.y);
+        //hide mouse and change it to target
         HideCursor();
         DrawTexture(player.sprite, player.x, player.y, WHITE);
         DrawTexture(target.sprite, target.x, target.y, WHITE);
@@ -124,6 +124,7 @@ int main()
         DrawText("TargetY:", 0, 240 , 80, WHITE);
         DrawText(targetYStr, 400, 240 , 80, WHITE);
         DrawCircle(bullet.x,bullet.y,20,YELLOW);
+        DrawLine(bullet.x,bullet.y,target.x,target.y,WHITE);
         if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) DrawText("MOUSE CLICK DETECTED",10,400,80,RED);
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
@@ -136,9 +137,9 @@ int main()
         }
         if (CheckCollisionRecs(bulletRect,clickRect)) shot_fired = false;
         if (shot_fired) DrawCircle(bullet.x,bullet.y,20,YELLOW);
-        if (bullet.x < click_x) bullet.x += 20;
-        if (bullet.x > click_x) bullet.x -= 20;
-        if (bullet.y > click_y) bullet.y -= 20;
+        if (bullet.x < click_x) bullet.x += 10;
+        if (bullet.x > click_x) bullet.x -= 10;
+        if (bullet.y > click_y) bullet.y -= 10;
         if (bullet.x == click_x)
         {
             if (bullet.y == click_y)
