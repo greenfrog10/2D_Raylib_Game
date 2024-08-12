@@ -1,6 +1,6 @@
 #include "raylib.h"
 #include <stdio.h> 
-
+#include <math.h>
 class Window{
     public:
         int width;
@@ -10,8 +10,7 @@ class Window{
 class Player
 {
     public:
-        int x;
-        int y;
+        Vector2 pos;
         int size;
         int speed;
         int y_velocity = 0;
@@ -27,8 +26,7 @@ class Player
 class Object
 {
     public:
-        int x;
-        int y;  
+        Vector2 pos;
         Texture2D sprite;
 };
 int main()
@@ -42,16 +40,14 @@ int main()
     player.size = 60;
     player.speed = 10;
     SetTargetFPS(60);
-    player.x = window.width / 2;
-    player.y = window.height / 2;
+    player.pos = center;
     player.sprite = LoadTexture("sprites/player.png");
     char playerXStr[10];
     char playerYStr[10];
     char targetXStr[10];
     char targetYStr[10];
     Object target;
-    target.x = 0;
-    target.y = 0;
+    target.pos = player.pos;
     target.sprite = LoadTexture("sprites/target.png");
     Object bullet;
     bool shot_fired = false;
@@ -61,8 +57,8 @@ int main()
     while (!WindowShouldClose())
     {
         // check Key inputs
-        if (IsKeyDown(KEY_RIGHT) || (IsKeyDown(KEY_D))) player.x += player.speed;
-        if (IsKeyDown(KEY_LEFT) || (IsKeyDown(KEY_A))) player.x -= player.speed;
+        if (IsKeyDown(KEY_RIGHT) || (IsKeyDown(KEY_D))) player.pos.x += player.speed;
+        if (IsKeyDown(KEY_LEFT) || (IsKeyDown(KEY_A))) player.pos.x -= player.speed;
         if (IsKeyDown(KEY_UP) || (IsKeyDown(KEY_W)))
         {
             if (player.block_jump != true)
@@ -70,51 +66,54 @@ int main()
                 if (player.is_on_floor) player.is_jumping = true;
                 player.block_jump = true;
                 player.is_on_floor = false;
-                player.y_before_jump = player.y;
+                player.y_before_jump = player.pos.y;
             }
         }
         //Moving The player
-        if(player.x >= 1100) player.x = 1100;
-        if(player.x <= 10) player.x = 10;
-        if(player.fall) player.y += 10;
+        if(player.pos.x >= 1100) player.pos.x = 1100;
+        if(player.pos.x <= 10) player.pos.x = 10;
+        if(player.fall) player.pos.y += 10;
         if (player.is_on_floor == false && player.is_jumping == false) player.fall = true;
-        if (player.is_jumping) player.y -= 15;
-        if (player.y_before_jump - player.y >= player.max_jump_height) player.is_jumping = false;
+        if (player.is_jumping) player.pos.y -= 15;
+        if (player.y_before_jump - player.pos.y >= player.max_jump_height) player.is_jumping = false;
         if (player.is_on_floor == true)
         {
             player.fall = false;
             player.block_jump = false;
         }
-        if (player.y >= 820)
+        if (player.pos.y >= 820)
         {            
             player.is_on_floor = true;
-            player.y = 820;
+            player.pos.y = 820;
         }
         else
         {
             player.is_on_floor = false;
         }
-        Rectangle bulletRect = { (float)bullet.x -  20, (float)bullet.y - 20, 50, 50 };
+        Rectangle bulletRect = {bullet.pos.x - 20 , bullet.pos.y, 50, 50 };
         Rectangle clickRect = { (float)click_x -  20, (float)click_y - 20, 50, 50 };
         if (shot_fired == false)
         {
-            bullet.x = player.x;
-            bullet.y = player.y;
+            bullet.pos.x = player.pos.x;
+            bullet.pos.y = player.pos.y;
         }
-        // Convert player.x and player.y to string to show on screen
-        sprintf(playerXStr, "%d", player.x);
-        sprintf(playerYStr, "%d", player.y);
+        // Convert player.pos.x and player.pos.y to string to show on screen
+        int round_player_x = int(roundf(player.pos.x));
+        int round_player_y = int(roundf(player.pos.y));
+        sprintf(playerXStr, "%d", round_player_x);
+        sprintf(playerYStr, "%d", round_player_y);
         //draw the window
         BeginDrawing();
         ClearBackground(GREEN);
-        target.x = GetMouseX();
-        target.y = GetMouseY();
-        sprintf(targetXStr, "%d", target.x);
-        sprintf(targetYStr, "%d", target.y);
+        target.pos = GetMousePosition();
+        int round_target_x = int(roundf(target.pos.x));
+        int round_target_y = int(roundf(target.pos.y));
+        sprintf(targetXStr, "%d", round_target_x);
+        sprintf(targetYStr, "%d", round_target_y);
         //hide mouse and change it to target
         HideCursor();
-        DrawTexture(player.sprite, player.x, player.y, WHITE);
-        DrawTexture(target.sprite, target.x, target.y, WHITE);
+        DrawTexture(player.sprite, player.pos.x, player.pos.y, WHITE);
+        DrawTexture(target.sprite, target.pos.x, target.pos.y, WHITE);
         DrawText("playerX:", 10, 10, 80, WHITE);;
         DrawText(playerXStr, 400, 10, 80, WHITE);
         DrawText("playerY:", 10, 90, 80, WHITE);;
@@ -123,8 +122,8 @@ int main()
         DrawText(targetXStr, 400, 160, 80, WHITE);
         DrawText("TargetY:", 0, 240 , 80, WHITE);
         DrawText(targetYStr, 400, 240 , 80, WHITE);
-        DrawCircle(bullet.x,bullet.y,20,YELLOW);
-        DrawLine(bullet.x,bullet.y,target.x,target.y,WHITE);
+        DrawCircle(bullet.pos.x,bullet.pos.y,20,YELLOW);
+        DrawLine(bullet.pos.x,bullet.pos.y,target.pos.x,target.pos.y,WHITE);
         if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) DrawText("MOUSE CLICK DETECTED",10,400,80,RED);
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
@@ -136,17 +135,10 @@ int main()
             }
         }
         if (CheckCollisionRecs(bulletRect,clickRect)) shot_fired = false;
-        if (shot_fired) DrawCircle(bullet.x,bullet.y,20,YELLOW);
-        if (bullet.x < click_x) bullet.x += 10;
-        if (bullet.x > click_x) bullet.x -= 10;
-        if (bullet.y > click_y) bullet.y -= 10;
-        if (bullet.x == click_x)
-        {
-            if (bullet.y == click_y)
-            {
-                shot_fired = false;
-            }
-        }
+        if (shot_fired) DrawCircle(bullet.pos.x,bullet.pos.y,20,YELLOW);
+        if (bullet.pos.x < click_x) bullet.pos.x += 10;
+        if (bullet.pos.x > click_x) bullet.pos.x -= 10;
+        if (bullet.pos.y > click_y) bullet.pos.y -= 10;
         EndDrawing();
     }
 
