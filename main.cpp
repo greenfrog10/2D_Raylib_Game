@@ -92,11 +92,7 @@ int main()
         }
         Rectangle bulletRect = {bullet.pos.x - 20 , bullet.pos.y, 50, 50 };
         Rectangle clickRect = { (float)click_x -  20, (float)click_y - 20, 50, 50 };
-        if (shot_fired == false)
-        {
-            bullet.pos.x = player.pos.x;
-            bullet.pos.y = player.pos.y;
-        }
+        bullet.pos = player.pos;
         // Convert player.pos.x and player.pos.y to string to show on screen
         int round_player_x = int(roundf(player.pos.x));
         int round_player_y = int(roundf(player.pos.y));
@@ -123,10 +119,11 @@ int main()
         DrawText("TargetY:", 0, 240 , 80, WHITE);
         DrawText(targetYStr, 400, 240 , 80, WHITE);
         DrawCircle(bullet.pos.x,bullet.pos.y,20,YELLOW);
-        DrawLine(bullet.pos.x,bullet.pos.y,target.pos.x,target.pos.y,WHITE);
+        DrawLineV(player.pos,target.pos,WHITE);
         if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) DrawText("MOUSE CLICK DETECTED",10,400,80,RED);
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
+            shot_fired = false;
             if (shot_fired == false)
             {
                 shot_fired = true;
@@ -134,11 +131,11 @@ int main()
                 click_y = GetMouseY();
             }
         }
-        if (CheckCollisionRecs(bulletRect,clickRect)) shot_fired = false;
-        if (shot_fired) DrawCircle(bullet.pos.x,bullet.pos.y,20,YELLOW);
-        if (bullet.pos.x < click_x) bullet.pos.x += 10;
-        if (bullet.pos.x > click_x) bullet.pos.x -= 10;
-        if (bullet.pos.y > click_y) bullet.pos.y -= 10;
+        if (shot_fired)
+        {
+            DrawLine(bullet.pos.x,bullet.pos.y,click_x,click_y,RED);
+            DrawCircle(click_x,click_y,20,WHITE);
+        }
         EndDrawing();
     }
 
