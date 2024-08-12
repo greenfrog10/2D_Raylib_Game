@@ -49,6 +49,10 @@ int main()
     char playerYStr[10];
     Texture2D target_sprite;
     target_sprite = LoadTexture("sprites/target.png");
+    Object bullet;
+    bool shot_fired = false;
+    int click_x = GetMouseX();
+    int click_y = GetMouseY();
     // Main game loop
     while (!WindowShouldClose())
     {
@@ -80,6 +84,18 @@ int main()
         if (player.y >= 820)
         {            
             player.is_on_floor = true;
+            player.y = 820;
+        }
+        else
+        {
+            player.is_on_floor = false;
+        }
+        Rectangle bulletRect = { (float)bullet.x -  20, (float)bullet.y - 20, 50, 50 };
+        Rectangle clickRect = { (float)click_x -  20, (float)click_y - 20, 50, 50 };
+        if (shot_fired == false)
+        {
+            bullet.x = player.x;
+            bullet.y = player.y;
         }
         // Convert player.x and player.y to string to show on screen
         sprintf(playerXStr, "%d", player.x);
@@ -96,6 +112,28 @@ int main()
         DrawText(playerXStr, 10, 10, 80, WHITE);
         DrawText(playerYStr, 10, 80, 80, WHITE);
         if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) DrawText("MOUSE CLICK DETECTED",10,180,80,WHITE);
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+        {
+            if (shot_fired == false)
+            {
+                shot_fired = true;
+                click_x = GetMouseX();
+                click_y = GetMouseY();
+            }
+        }
+        if (CheckCollisionRecs(bulletRect,clickRect)) shot_fired = false;
+        if (shot_fired) DrawCircle(bullet.x,bullet.y,20,YELLOW);
+        if (bullet.x < click_x) bullet.x += 20;
+        if (bullet.x > click_x) bullet.x -= 20;
+        if (bullet.y > click_y) bullet.y -= 20;
+        if (bullet.x == click_x)
+        {
+            if (bullet.y == click_y)
+            {
+                shot_fired = false;
+            }
+        }
+        DrawLine(player.x,  player.y,target_x , target_y, BLACK);
         EndDrawing();
     }
 
