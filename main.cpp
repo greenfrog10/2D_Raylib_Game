@@ -31,8 +31,9 @@ class Object
 };
 int main()
 {
+    bool shot_fired = false;
     Window window;
-    window.width = 1200;
+    window.width = 1400;
     window.height = 900;
     InitWindow(window.width, window.height,"My game");
     Vector2 center{window.width / 2,window.height / 2};
@@ -50,9 +51,12 @@ int main()
     target.pos = player.pos;
     target.sprite = LoadTexture("sprites/target.png");
     Object bullet;
-    bool shot_fired = false;
     int click_x = GetMouseX();
     int click_y = GetMouseY();
+    int x_destination = 0;
+    int y_destination = 0;
+    int pos_division = 100;
+    bool bullet_follow_player = true;
     // Main game loop
     while (!WindowShouldClose())
     {
@@ -70,7 +74,7 @@ int main()
             }
         }
         //Moving The player
-        if(player.pos.x >= 1100) player.pos.x = 1100;
+        if(player.pos.x >= 1300) player.pos.x = 1300;
         if(player.pos.x <= 10) player.pos.x = 10;
         if(player.fall) player.pos.y += 10;
         if (player.is_on_floor == false && player.is_jumping == false) player.fall = true;
@@ -90,51 +94,42 @@ int main()
         {
             player.is_on_floor = false;
         }
-        Rectangle bulletRect = {bullet.pos.x - 20 , bullet.pos.y, 50, 50 };
-        Rectangle clickRect = { (float)click_x -  20, (float)click_y - 20, 50, 50 };
-        bullet.pos = player.pos;
-        // Convert player.pos.x and player.pos.y to string to show on screen
-        int round_player_x = int(roundf(player.pos.x));
-        int round_player_y = int(roundf(player.pos.y));
-        sprintf(playerXStr, "%d", round_player_x);
-        sprintf(playerYStr, "%d", round_player_y);
+        if (bullet_follow_player) bullet.pos = player.pos;
+        Rectangle bulletRect = {bullet.pos.x - 20 , bullet.pos.y - 20, 60, 60 };
+        Rectangle clickRect = { (float)click_x -  20, (float)click_y - 20, 60, 60 };
         //draw the window
         BeginDrawing();
         ClearBackground(GREEN);
         target.pos = GetMousePosition();
-        int round_target_x = int(roundf(target.pos.x));
-        int round_target_y = int(roundf(target.pos.y));
-        sprintf(targetXStr, "%d", round_target_x);
-        sprintf(targetYStr, "%d", round_target_y);
         //hide mouse and change it to target
         HideCursor();
         DrawTextureV(player.sprite, player.pos, WHITE);
         DrawTextureV(target.sprite, target.pos, WHITE);
-        DrawText("playerX:", 10, 10, 80, WHITE);;
-        DrawText(playerXStr, 400, 10, 80, WHITE);
-        DrawText("playerY:", 10, 90, 80, WHITE);;
-        DrawText(playerYStr, 400, 90, 80, WHITE);
-        DrawText("TargetX:", 0, 160, 80, WHITE);
-        DrawText(targetXStr, 400, 160, 80, WHITE);
-        DrawText("TargetY:", 0, 240 , 80, WHITE);
-        DrawText(targetYStr, 400, 240 , 80, WHITE);
-        DrawCircle(bullet.pos.x,bullet.pos.y,20,YELLOW);
-        DrawLineV(player.pos,target.pos,WHITE);
-        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) DrawText("MOUSE CLICK DETECTED",10,400,80,RED);
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
-            shot_fired = false;
-            if (shot_fired == false)
-            {
-                shot_fired = true;
-                click_x = GetMouseX();
-                click_y = GetMouseY();
-            }
+                if (shot_fired != true)
+                {
+                    click_x = GetMouseX();
+                    click_y = GetMouseY();
+                    shot_fired = true;
+                }
         }
         if (shot_fired)
         {
-            DrawLine(bullet.pos.x,bullet.pos.y,click_x,click_y,RED);
-            DrawCircle(click_x,click_y,20,WHITE);
+            bullet_follow_player = false;
+            DrawCircle(bullet.pos.x,bullet.pos.y,20,PURPLE);
+            x_destination = (click_x - bullet.pos.x) / 20;
+            y_destination = (click_y - bullet.pos.y) / 20;
+        }
+        if (CheckCollisionRecs(bulletRect,clickRect) == false)
+        {
+        bullet.pos.x += x_destination;
+        bullet.pos.y += y_destination;
+        }
+        else
+        {
+                shot_fired = false;
+                bullet_follow_player = true;
         }
         EndDrawing();
     }
