@@ -23,11 +23,19 @@ class Player
         int max_jump_height = 250;
         Texture2D sprite;
 };
-class Object
+class Floating_Object
 {
     public:
         Vector2 pos;
         Texture2D sprite;
+};
+class Object
+{
+    public: 
+        Vector2 pos;
+        Texture2D sprite;
+        bool is_on_floor = false;
+        bool fall = true;
 };
 int main()
 {
@@ -47,16 +55,21 @@ int main()
     char playerYStr[10];
     char targetXStr[10];
     char targetYStr[10];
-    Object target;
+    Floating_Object target;
     target.pos = player.pos;
     target.sprite = LoadTexture("sprites/target.png");
-    Object bullet;
+    Floating_Object bullet;
+    Object box;
+    box.pos.x = 1200;
+    box.pos.y = 0;
+    box.sprite = LoadTexture("sprites/box.png");
     int click_x = GetMouseX();
     int click_y = GetMouseY();
-    int x_destination = 0;
-    int y_destination = 0;
+    int bullet_x_destination = 0;
+    int bullet_y_destination = 0;
     int pos_division = 100;
     bool bullet_follow_player = true;
+    bool show_box = true;
     // Main game loop
     while (!WindowShouldClose())
     {
@@ -94,9 +107,21 @@ int main()
         {
             player.is_on_floor = false;
         }
+        if(box.is_on_floor == false) box.fall = true;
+        if (box.fall) box.pos.y += 6;
+        if (box.pos.y  >= 820)
+        {
+            box.is_on_floor = true;
+            box.pos.y = 820;
+        }
+        else
+        {
+            box.fall = true;
+        }
         if (bullet_follow_player) bullet.pos = player.pos;
         Rectangle bulletRect = {bullet.pos.x - 20 , bullet.pos.y - 20, 60, 60 };
-        Rectangle clickRect = { (float)click_x -  20, (float)click_y - 20, 60, 60 };
+        Rectangle clickRect = { (float)click_x -  20, (float)click_y - 20, 20, 20 };
+        Rectangle boxRect = {box.pos.x,box.pos.y,60,60};    
         //draw the window
         BeginDrawing();
         ClearBackground(GREEN);
@@ -105,6 +130,7 @@ int main()
         HideCursor();
         DrawTextureV(player.sprite, player.pos, WHITE);
         DrawTextureV(target.sprite, target.pos, WHITE);
+        if(show_box) DrawTextureV(box.sprite,box.pos,WHITE);
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
                 if (shot_fired != true)
@@ -118,19 +144,20 @@ int main()
         {
             bullet_follow_player = false;
             DrawCircle(bullet.pos.x,bullet.pos.y,20,PURPLE);
-            x_destination = (click_x - bullet.pos.x) / 20;
-            y_destination = (click_y - bullet.pos.y) / 20;
+            bullet_x_destination = (click_x - bullet.pos.x) / 20;
+            bullet_y_destination = (click_y - bullet.pos.y) / 20;
         }
-        if (CheckCollisionRecs(bulletRect,clickRect) == false)
-        {
-        bullet.pos.x += x_destination;
-        bullet.pos.y += y_destination;
-        }
-        else
+        if (CheckCollisionRecs(bulletRect,clickRect))
         {
                 shot_fired = false;
                 bullet_follow_player = true;
         }
+        else
+        {
+            bullet.pos.x += bullet_x_destination;
+            bullet.pos.y += bullet_y_destination;
+        }
+        if (CheckCollisionRecs(bulletRect,boxRect)) show_box = false;
         EndDrawing();
     }
 
