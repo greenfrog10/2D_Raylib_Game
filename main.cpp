@@ -92,7 +92,9 @@ int main() {
     
     Object gun;
     gun.pos = player.pos;
-    gun.sprite = LoadTexture("sprites/gun_right.png");
+    Texture2D gun_left = LoadTexture("sprites/gun_left.png");
+    Texture2D gun_right = LoadTexture("sprites/gun_right.png");
+    gun.sprite = gun_right;
     bool gun_facing_left = false;
     bool gun_facing_right = true;
     
@@ -133,7 +135,6 @@ int main() {
         if (CheckCollisionRecs(player.Rect, ground.Rect)) player.is_on_floor = true;
         if (player.pos.x <= 10) player.pos.x = 10;
         if (player.pos.x >= window.width - 100) player.pos.x = window.width - 100;
-        if (player.fall) player.pos.y += 10;
         if (!player.is_on_floor && !player.is_jumping) player.fall = true;
         if (player.is_jumping) player.pos.y -= 20;
         if (player.y_before_jump - player.pos.y >= player.max_jump_height) player.is_jumping = false;
@@ -146,6 +147,7 @@ int main() {
             player.fall = true;
             player.block_jump = true;
         }
+        if (player.fall) player.pos.y += 10;
         box.Fall(ground.Rect,box.is_on_floor, box.fall, box.pos);
         box2.Fall(ground.Rect,box2.is_on_floor, box2.fall, box2.pos);
         
@@ -188,13 +190,13 @@ int main() {
         {
             gun.pos.x = player.pos.x + 80;
             gun.pos.y = player.pos.y;
-            gun.sprite = LoadTexture("sprites/gun_right.png");
+            gun.sprite = gun_right;
         }
         if (gun_facing_left)
         {
             gun.pos.x = player.pos.x - 80;
             gun.pos.y = player.pos.y;
-            gun.sprite = LoadTexture("sprites/gun_left.png");
+            gun.sprite = gun_left;
         }
         DrawTextureV(gun.sprite, gun.pos,WHITE);
         
