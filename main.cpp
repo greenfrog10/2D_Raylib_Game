@@ -36,7 +36,23 @@ class Object
         Texture2D sprite;
         bool is_on_floor = false;
         bool fall = true;
+        bool show = true;
 };
+int Fall(bool is_on_floor, bool fall, Vector2 pos)
+    {
+        if(is_on_floor == false) fall = true;
+        if (fall) pos.y += 8;
+        if (pos.y >= 820)
+        {
+                is_on_floor = true;
+                pos.y = 820;
+        }
+        else
+        {
+            fall = true;
+        }
+        return pos.y;
+}
 int main()
 {
     bool shot_fired = false;
@@ -51,25 +67,24 @@ int main()
     SetTargetFPS(60);
     player.pos = center;
     player.sprite = LoadTexture("sprites/player.png");
-    char playerXStr[10];
-    char playerYStr[10];
-    char targetXStr[10];
-    char targetYStr[10];
     Floating_Object target;
     target.pos = player.pos;
     target.sprite = LoadTexture("sprites/target.png");
     Floating_Object bullet;
     Object box;
+    Object box2;
     box.pos.x = 1200;
     box.pos.y = 0;
+    box2.pos.x = 1300;
+    box2.pos.y = 0;
     box.sprite = LoadTexture("sprites/box.png");
+    box2.sprite = box.sprite;
     int click_x = GetMouseX();
     int click_y = GetMouseY();
     int bullet_x_destination = 0;
     int bullet_y_destination = 0;
-    int pos_division = 100;
     bool bullet_follow_player = true;
-    bool show_box = true;
+    Rectangle bulletRect = {bullet.pos.x - 20 , bullet.pos.y - 20, 60, 60 };
     // Main game loop
     while (!WindowShouldClose())
     {
@@ -107,21 +122,13 @@ int main()
         {
             player.is_on_floor = false;
         }
-        if(box.is_on_floor == false) box.fall = true;
-        if (box.fall) box.pos.y += 6;
-        if (box.pos.y  >= 820)
-        {
-            box.is_on_floor = true;
-            box.pos.y = 820;
-        }
-        else
-        {
-            box.fall = true;
-        }
+        box.pos.y = Fall(box.is_on_floor, box.fall, box.pos);
+        box2.pos.y = Fall(box2.is_on_floor,box2.fall,box2.pos);
         if (bullet_follow_player) bullet.pos = player.pos;
-        Rectangle bulletRect = {bullet.pos.x - 20 , bullet.pos.y - 20, 60, 60 };
+        Rectangle bulletRect = {bullet.pos.x - 20 , bullet.pos.y - 20, 40, 40 };
         Rectangle clickRect = { (float)click_x -  20, (float)click_y - 20, 20, 20 };
-        Rectangle boxRect = {box.pos.x,box.pos.y,60,60};    
+        Rectangle boxRect = {box.pos.x,box.pos.y,60,60};   
+        Rectangle box2Rect = {box2.pos.x,box2.pos.y,60,60};
         //draw the window
         BeginDrawing();
         ClearBackground(GREEN);
@@ -130,7 +137,8 @@ int main()
         HideCursor();
         DrawTextureV(player.sprite, player.pos, WHITE);
         DrawTextureV(target.sprite, target.pos, WHITE);
-        if(show_box) DrawTextureV(box.sprite,box.pos,WHITE);
+        if(box.show) DrawTextureV(box.sprite,box.pos,WHITE);
+        if (box2.show) DrawTextureV(box2.sprite,box2.pos,WHITE);
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
                 if (shot_fired != true)
@@ -146,18 +154,31 @@ int main()
             DrawCircle(bullet.pos.x,bullet.pos.y,20,PURPLE);
             bullet_x_destination = (click_x - bullet.pos.x) / 20;
             bullet_y_destination = (click_y - bullet.pos.y) / 20;
-        }
-        if (CheckCollisionRecs(bulletRect,clickRect))
-        {
+            if (CheckCollisionRecs(bulletRect,clickRect))
+            {
                 shot_fired = false;
                 bullet_follow_player = true;
+            }
+            else
+            {
+                bullet.pos.x += bullet_x_destination;
+                bullet.pos.y += bullet_y_destination;
+            }
+            if (box.show)
+            {
+                if (CheckCollisionRecs(bulletRect,boxRect))
+                { 
+                    box.show = false;
+                }
+            }
+            if (box2.show)
+            {
+                if (CheckCollisionRecs(bulletRect,box2Rect))
+                {
+                    box2.show = false;
+                }
+            }
         }
-        else
-        {
-            bullet.pos.x += bullet_x_destination;
-            bullet.pos.y += bullet_y_destination;
-        }
-        if (CheckCollisionRecs(bulletRect,boxRect)) show_box = false;
         EndDrawing();
     }
 
