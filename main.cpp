@@ -167,7 +167,6 @@ int main() {
                 bullet.pos.x += bullet_x_destination;
                 bullet.pos.y += bullet_y_destination;
             }
-            // Use the new method for handling collisions
             box.HandleBulletCollision(bulletRect, shot_fired, bullet_follow_player);
             box2.HandleBulletCollision(bulletRect, shot_fired, bullet_follow_player);
         }
