@@ -52,7 +52,7 @@ public:
             fall = true;
         }
     }
-    void HandleBulletCollision(Rectangle bulletRect, bool &shot_fired, bool &bullet_follow_player) 
+    void CheckBulletCollision(Rectangle bulletRect, bool &shot_fired, bool &bullet_follow_player) 
     {
         if (show && CheckCollisionRecs(bulletRect, Rect)) 
         {
@@ -66,7 +66,7 @@ public:
 int main() {
     bool shot_fired = false;
     Window window;
-    window.width = 1400;
+    window.width = 1500;
     window.height = 900;
     InitWindow(window.width, window.height, "My game");
     Vector2 center{window.width / 2, window.height / 2};
@@ -109,8 +109,8 @@ int main() {
             }
         }
         
-        // Moving The player
-        if (player.pos.x >= 1300) player.pos.x = 1300;
+        // Check Borders for player
+        if (player.pos.x >= window.width - 100) player.pos.x = window.width - 100;
         if (player.pos.x <= 10) player.pos.x = 10;
         if (player.fall) player.pos.y += 10;
         if (!player.is_on_floor && !player.is_jumping) player.fall = true;
@@ -120,9 +120,9 @@ int main() {
             player.fall = false;
             player.block_jump = false;
         }
-        if (player.pos.y >= 820) {
+        if (player.pos.y >= window.height - 80) {
             player.is_on_floor = true;
-            player.pos.y = 820;
+            player.pos.y = window.height - 80;
         } else {
             player.is_on_floor = false;
         }
@@ -157,7 +157,7 @@ int main() {
         
         if (shot_fired) {
             bullet_follow_player = false;
-            DrawCircle(bullet.pos.x, bullet.pos.y, 20, PURPLE);
+            DrawCircle(bullet.pos.x, bullet.pos.y, 20, YELLOW);
             bullet_x_destination = (click_x - bullet.pos.x) / 20;
             bullet_y_destination = (click_y - bullet.pos.y) / 20;
             if (CheckCollisionRecs(bulletRect, clickRect)) {
@@ -167,8 +167,9 @@ int main() {
                 bullet.pos.x += bullet_x_destination;
                 bullet.pos.y += bullet_y_destination;
             }
-            box.HandleBulletCollision(bulletRect, shot_fired, bullet_follow_player);
-            box2.HandleBulletCollision(bulletRect, shot_fired, bullet_follow_player);
+            // Use the new method for handling collisions
+            box.CheckBulletCollision(bulletRect, shot_fired, bullet_follow_player);
+            box2.CheckBulletCollision(bulletRect, shot_fired, bullet_follow_player);
         }
         
         EndDrawing();
