@@ -23,12 +23,22 @@ public:
     int max_jump_height = 250;
     Rectangle Rect;
     Texture2D sprite;
+    void Update_Rect()
+    {
+       Rect = {pos.x,pos.y,60,60};
+    }
 };
 
 class Floating_Object {
 public:
     Vector2 pos;
     Texture2D sprite;
+    Rectangle Rect;
+    void  Update_Rect(int width, int height)
+    {       
+        Rect = {pos.x - 20, pos.y - 20, width,height};
+    }
+
 };
 
 class Object {
@@ -59,8 +69,21 @@ public:
             gun_follow_player = true;
         }
     }
+    void Show()
+    {
+        if (show)  DrawTextureV(sprite, pos, WHITE);
+    }
+    void Update_Rect(int width,int height)
+    {
+        Rect = {pos.x, pos.y, width, height};
+    }
 };
-
+void Change_mouse_to_Target(Texture2D sprite,Vector2 &pos)
+{
+    HideCursor();
+    pos = GetMousePosition();
+    DrawTextureV(sprite,pos,WHITE);
+}
 int main() {
     
     Window window;
@@ -83,12 +106,17 @@ int main() {
     Object box;  
     box.pos.x = 1200;
     box.pos.y = 0;
+    box.sprite = LoadTexture("sprites/box.png");
     
     Object box2; 
     box2.pos.x = 1300;
     box2.pos.y = 0;
-    box.sprite = LoadTexture("sprites/box.png");
     box2.sprite = box.sprite;
+    
+    Object box3;
+    box3.pos.x = 1000;
+    box3.pos.y = 0;
+    box3.sprite = box.sprite;
     
     Object gun;
     gun.pos = player.pos;
@@ -124,12 +152,13 @@ int main() {
             }
         }
         
-        // create rectangles 
-        player.Rect = {player.pos.x,player.pos.y,60,60};
-        Rectangle bulletRect = {bullet.pos.x - 20, bullet.pos.y - 20, 50,50};
+        // Update_Rects
+        player.Update_Rect();
+        bullet.Update_Rect(50,50);
         Rectangle clickRect = {(float)click_x - 20, (float)click_y - 20, 20, 20};
-        box.Rect = {box.pos.x, box.pos.y, 60, 60};   
-        box2.Rect = {box2.pos.x, box2.pos.y, 60, 60};
+        box.Update_Rect(60,60);   
+        box2.Update_Rect(60,60);
+        box3.Update_Rect(60,60);
         ground.Rect = {ground.pos.x,ground.pos.y,1450,100};
         // Check Borders for player
         if (CheckCollisionRecs(player.Rect, ground.Rect)) player.is_on_floor = true;
@@ -150,7 +179,8 @@ int main() {
         if (player.fall) player.pos.y += 10;
         box.Fall(ground.Rect,box.is_on_floor, box.fall, box.pos);
         box2.Fall(ground.Rect,box2.is_on_floor, box2.fall, box2.pos);
-        
+        box3.Fall(ground.Rect,box3.is_on_floor, box3.fall, box3.pos);
+        Change_mouse_to_Target(target.sprite,target.pos);
         if (gun_follow_player) 
         {
             bullet.pos = gun.pos;
@@ -166,7 +196,6 @@ int main() {
         // Draw the window
         BeginDrawing();
         ClearBackground(PURPLE);
-        target.pos = GetMousePosition();
         if (target.pos.x < center.x)
         {
             gun_facing_right = false;
@@ -176,16 +205,14 @@ int main() {
         {
             gun_facing_right = true;
             gun_facing_left = false;    
-        }
-        // Hide mouse and change it to target
-        HideCursor();
-        
+        }       
         // Draw The Objects on the screeen
         DrawRectangleV(ground.pos,Vector2{1500,500},WHITE);
         DrawTextureV(player.sprite, player.pos, WHITE);
-        DrawTextureV(target.sprite, target.pos, WHITE);
-        if (box.show) DrawTextureV(box.sprite, box.pos, WHITE);
-        if (box2.show) DrawTextureV(box2.sprite, box2.pos, WHITE);
+        box.Show();
+        box2.Show();
+        box3.Show();
+        Change_mouse_to_Target(target.sprite,target.pos);
         if (gun_facing_right)
         {
             gun.pos.x = player.pos.x + 80;
@@ -214,7 +241,7 @@ int main() {
             DrawCircle(bullet.pos.x, bullet.pos.y, 20, YELLOW);
             bullet_x_destination = (click_x - bullet.pos.x) / 20;
             bullet_y_destination = (click_y - bullet.pos.y) / 20;
-            if (CheckCollisionRecs(bulletRect, clickRect)) {
+            if (CheckCollisionRecs(bullet.Rect, clickRect)) {
                 shot_fired = false;
                 gun_follow_player = true;
             } else {
@@ -222,8 +249,9 @@ int main() {
                 bullet.pos.y += bullet_y_destination;
             }
             // Use the new method for handling collisions
-            box.CheckBulletCollision(bulletRect, shot_fired, gun_follow_player);
-            box2.CheckBulletCollision(bulletRect, shot_fired, gun_follow_player);
+            box.CheckBulletCollision(bullet.Rect, shot_fired, gun_follow_player);
+            box2.CheckBulletCollision(bullet.Rect, shot_fired, gun_follow_player);
+            box3.CheckBulletCollision(bullet.Rect, shot_fired, gun_follow_player);
         }
         
         EndDrawing();
