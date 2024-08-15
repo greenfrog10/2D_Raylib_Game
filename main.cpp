@@ -135,9 +135,7 @@ int main() {
     Rectangle bulletRect = {bullet.pos.x - 20, bullet.pos.y - 20, 60, 60};
     bool shot_fired = false;
     
-    Object ground;
-    ground.pos.x = 0;
-    ground.pos.y = 780;
+    Rectangle ground = {0,800,1250,100};
     // Main game loop
     while (!WindowShouldClose()) {
         // Check Key inputs and move player
@@ -159,9 +157,9 @@ int main() {
         box.Update_Rect(60,60);   
         box2.Update_Rect(60,60);
         box3.Update_Rect(60,60);
-        ground.Rect = {ground.pos.x,ground.pos.y,1450,100};
         // Check Borders for player
-        if (CheckCollisionRecs(player.Rect, ground.Rect)) player.is_on_floor = true;
+        if (CheckCollisionRecs(player.Rect, ground)) player.is_on_floor = true;
+        else player.is_on_floor = false;
         if (player.pos.x <= 10) player.pos.x = 10;
         if (player.pos.x >= window.width - 100) player.pos.x = window.width - 100;
         if (!player.is_on_floor && !player.is_jumping) player.fall = true;
@@ -177,9 +175,9 @@ int main() {
             player.block_jump = true;
         }
         if (player.fall) player.pos.y += 10;
-        box.Fall(ground.Rect,box.is_on_floor, box.fall, box.pos);
-        box2.Fall(ground.Rect,box2.is_on_floor, box2.fall, box2.pos);
-        box3.Fall(ground.Rect,box3.is_on_floor, box3.fall, box3.pos);
+        box.Fall(ground,box.is_on_floor, box.fall, box.pos);
+        box2.Fall(ground,box2.is_on_floor, box2.fall, box2.pos);
+        box3.Fall(ground,box3.is_on_floor, box3.fall, box3.pos);
         Change_mouse_to_Target(target.sprite,target.pos);
         if (gun_follow_player) 
         {
@@ -207,7 +205,7 @@ int main() {
             gun_facing_left = false;    
         }       
         // Draw The Objects on the screeen
-        DrawRectangleV(ground.pos,Vector2{1500,500},WHITE);
+        DrawRectangleRec(ground,PINK);
         DrawTextureV(player.sprite, player.pos, WHITE);
         box.Show();
         box2.Show();
