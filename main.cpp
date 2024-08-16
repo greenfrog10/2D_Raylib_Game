@@ -65,7 +65,7 @@ public:
         if (CheckCollisionRecs(Rect,groundRect)) fall = false;
         else
         {
-            fall = true;
+            fall = true;    
         }
         if (fall) pos.y += 9;
     }
@@ -86,13 +86,9 @@ public:
     {
         Rect = {pos.x, pos.y, rect_width, rect_height};
     }
-    void Check_if_pushed(bool right,bool left,Rectangle p_rect)
+    bool Check_collision_with_player(Rectangle player_rect)
     {
-        if (CheckCollisionRecs(Rect,p_rect))
-        {
-            if (right) pos.x += 10;
-            if (left) pos.x -= 10;
-        }
+        return (CheckCollisionRecs(Rect,player_rect));
     }
 };
 void Change_mouse_to_Target(Texture2D sprite,Vector2 &pos)
@@ -225,10 +221,6 @@ int main() {
         box2.Fall(ground);
         box3.Fall(ground);
         big_box.Fall(ground);
-        box.Check_if_pushed(player.right,player.left,player.Rect);
-        box2.Check_if_pushed(player.right,player.left,player.Rect);
-        box3.Check_if_pushed(player.right,player.left,player.Rect);
-        big_box.Check_if_pushed(player.right,player.left,player.Rect);
         Change_mouse_to_Target(target.sprite,target.pos);
         if (gun_follow_player) 
         {
