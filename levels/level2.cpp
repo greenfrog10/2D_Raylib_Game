@@ -1,16 +1,16 @@
 #include "raylib.h"
-#include "level1.h"
+#include "level2.h"
 #include "../window/window.h"
 #include "../player/player.h"
 #include "../floating_object/floating_object.h"
 #include "../object/object.h"
 #include "../change_mouse_to_target/change_mouse_to_target.h"
-void run_level1() {
+void run_level2() {
     bool run = true;
     Window window;
     window.width = 1600;
     window.height = 900;
-    InitWindow(window.width, window.height, "level 1");
+    InitWindow(window.width, window.height, "level 2");
     Vector2 center{window.width / 2, window.height / 2};
 
     Player player;
@@ -23,7 +23,14 @@ void run_level1() {
     Floating_Object target;
     target.pos = player.pos;
     target.sprite = LoadTexture("sprites/target.png");
-
+    
+    Object pickable_gun;
+    pickable_gun.pos.x = 0;
+    pickable_gun.pos.y = 0;
+    pickable_gun.rect_width = 80;
+    pickable_gun.rect_height = 80;
+    pickable_gun.sprite = LoadTexture("sprites/gun_right.png");
+    
     Object gun;
     gun.pos = player.pos;
     Texture2D gun_left = LoadTexture("sprites/gun_left.png");
@@ -126,8 +133,7 @@ void run_level1() {
         // Draw The Objects on the screen
         DrawRectangleRec(ground, PINK);
         player.Show();
-        DrawText("Use Arrow Keys or ZQSD to move", 0, 0, 80, WHITE);
-
+        DrawText("Pickup the gun", 0, 0, 80, WHITE);
         if (!gun_disabled) {
             Change_mouse_to_Target(target.sprite, target.pos);
 

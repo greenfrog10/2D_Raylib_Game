@@ -1,0 +1,10 @@
+#ifndef WINDOW_H  
+#define WINDOW_H
+
+class Window {
+public:
+    int width;
+    int height;
+};
+
+#endif
