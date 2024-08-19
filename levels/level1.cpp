@@ -5,7 +5,7 @@
 #include "../floating_object/floating_object.h"
 #include "../object/object.h"
 #include "../change_mouse_to_target/change_mouse_to_target.h"
-void run_level1() {
+bool run_level1() {
     bool run = true;
     Window window;
     window.width = 1600;
@@ -31,6 +31,7 @@ void run_level1() {
     gun.sprite = gun_right;
     bool gun_facing_left = false;
     bool gun_facing_right = true;
+    
 
     Floating_Object bullet;
     int click_x = GetMouseX();
@@ -68,7 +69,7 @@ void run_level1() {
             }
         }
 
-        if (WindowShouldClose()) run = false;
+        if (WindowShouldClose()) return false;
 
         // Move player 
         if (player.right) player.pos.x += player.speed;
@@ -170,6 +171,11 @@ void run_level1() {
 
         EndDrawing();
     }
+    UnloadTexture(player.sprite);
+    UnloadTexture(target.sprite);
+    UnloadTexture(gun_left);
+    UnloadTexture(gun_right);
 
     CloseWindow();
+    return true;
 }

@@ -5,7 +5,11 @@
 #include "../floating_object/floating_object.h"
 #include "../object/object.h"
 #include "../change_mouse_to_target/change_mouse_to_target.h"
-void run_level2() {
+bool run_level2() {
+    bool autorise_exit = false;
+    char *tutorial_text;
+    bool tutorial_finished = false;
+    tutorial_text = "Pickup the gun";
     bool run = true;
     Window window;
     window.width = 1600;
@@ -24,12 +28,6 @@ void run_level2() {
     target.pos = player.pos;
     target.sprite = LoadTexture("sprites/target.png");
     
-    Object pickable_gun;
-    pickable_gun.pos.x = 0;
-    pickable_gun.pos.y = 0;
-    pickable_gun.rect_width = 80;
-    pickable_gun.rect_height = 80;
-    pickable_gun.sprite = LoadTexture("sprites/gun_right.png");
     
     Object gun;
     gun.pos = player.pos;
@@ -38,6 +36,27 @@ void run_level2() {
     gun.sprite = gun_right;
     bool gun_facing_left = false;
     bool gun_facing_right = true;
+    
+    Object pickable_gun;
+    pickable_gun.pos.x = 500;
+    pickable_gun.pos.y = 720;
+    pickable_gun.rect_width = 80;
+    pickable_gun.rect_height = 80;
+    pickable_gun.sprite = gun_right;
+    
+    bool show_boxes = false;
+    Object box;
+    box.pos.x = 700;
+    box.rect_width = 80;
+    box.rect_height = 80;
+    box.sprite = LoadTexture("sprites/box.png");
+    
+    Object big_box;
+    big_box.pos.x = 800;
+    big_box.rect_width = 160;
+    big_box.rect_height = 80;
+    big_box.sprite = LoadTexture("sprites/big_box.png");
+
 
     Floating_Object bullet;
     int click_x = GetMouseX();
@@ -84,15 +103,23 @@ void run_level2() {
         // Update Rectangles
         player.Update_Rect();
         bullet.Update_Rect(50, 50);
+        box.Update_Rect();
+        big_box.Update_Rect();
+        pickable_gun.Update_Rect();
         Rectangle clickRect = {(float)click_x - 20, (float)click_y - 20, 20, 20};
 
-        // Check Borders for player
         if (CheckCollisionRecs(player.Rect, ground)) player.is_on_floor = true;
         else player.is_on_floor = false;
 
         if (player.pos.x <= 10) player.pos.x = 10;
-        if (player.pos.x >= window.width - 100) run = false;
-
+        if (player.pos.x >= window.width - 100)
+        {
+            if (autorise_exit)
+            {
+                run = false;
+            }
+            player.pos.x = window.width - 100;
+        }
         if (!player.is_on_floor && !player.is_jumping) player.fall = true;
         if (player.is_jumping) player.pos.y -= 25;
         if (player.y_before_jump - player.pos.y >= player.max_jump_height) player.is_jumping = false;
@@ -133,7 +160,25 @@ void run_level2() {
         // Draw The Objects on the screen
         DrawRectangleRec(ground, PINK);
         player.Show();
-        DrawText("Pickup the gun", 0, 0, 80, WHITE);
+        if (gun_disabled) pickable_gun.Show();
+        if (show_boxes)
+        {
+            box.Fall(ground);
+            big_box.Fall(ground);
+            box.Show();
+            big_box.Show();
+        }
+        DrawText(tutorial_text, 0, 0, 80, WHITE);
+        if (pickable_gun.Check_collision_with_player(player.Rect))
+        {
+            if (tutorial_finished) tutorial_text = "Well done !";
+            else
+            {
+                tutorial_text = "Shoot the boxes !";
+            }
+            show_boxes = true;
+            gun_disabled = false;
+        }
         if (!gun_disabled) {
             Change_mouse_to_Target(target.sprite, target.pos);
 
@@ -171,11 +216,25 @@ void run_level2() {
                     bullet.pos.x += bullet_x_destination;
                     bullet.pos.y += bullet_y_destination;
                 }
+                if (show_boxes)
+                {
+                    box.CheckBulletCollision(bullet.Rect,shot_fired,gun_follow_player); 
+                    big_box.CheckBulletCollision(bullet.Rect,shot_fired,gun_follow_player);
+                }
+                if (!box.show && !big_box.show)
+                {
+                    autorise_exit = true;
+                    tutorial_finished = true;
+                }
             }
         }
 
         EndDrawing();
     }
-
+    UnloadTexture(player.sprite);
+    UnloadTexture(target.sprite);
+    UnloadTexture(gun_left);
+    UnloadTexture(gun_right);
+    UnloadTexture(pickable_gun.sprite);
     CloseWindow();
 }
