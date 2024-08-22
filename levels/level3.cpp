@@ -1,20 +1,19 @@
 #include "raylib.h"
-#include "level2.h"
+#include "level3.h"
 #include "../window/window.h"
 #include "../player/player.h"
 #include "../floating_object/floating_object.h"
 #include "../object/object.h"
 #include "../change_mouse_to_target/change_mouse_to_target.h"
-bool run_level2() {
+bool run_level3() 
+{
     bool autorise_exit = false;
-    char *tutorial_text;
-    bool tutorial_finished = false;
-    tutorial_text = "Pickup the gun";
     bool run = true;
+    int box_max_speed = 15;
     Window window;
     window.width = 1600;
     window.height = 900;
-    InitWindow(window.width, window.height, "level 2");
+    InitWindow(window.width, window.height, "level 3");
     Vector2 center{window.width / 2, window.height / 2};
 
     Player player;
@@ -27,8 +26,7 @@ bool run_level2() {
     Floating_Object target;
     target.pos = player.pos;
     target.sprite = LoadTexture("sprites/target.png");
-    
-    
+
     Object gun;
     gun.pos = player.pos;
     Texture2D gun_left = LoadTexture("sprites/gun_left.png");
@@ -36,28 +34,23 @@ bool run_level2() {
     gun.sprite = gun_right;
     bool gun_facing_left = false;
     bool gun_facing_right = true;
-    
-    Object pickable_gun;
-    pickable_gun.pos.x = 500;
-    pickable_gun.pos.y = 720;
-    pickable_gun.rect_width = 80;
-    pickable_gun.rect_height = 80;
-    pickable_gun.sprite = gun_right;
-    
-    bool show_boxes = false;
+ 
     Object box;
-    box.pos.x = 700;
-    box.rect_width = 80;
-    box.rect_height = 80;
-    box.sprite = LoadTexture("sprites/box.png");
+    box.pos.x = center.x;
+    box.pos.y = 720;
+    box.sprite = LoadTexture("sprites/metal_box.png");
+    box.rect_width = 121;
+    box.rect_height = 115;
+    box.Move_left();
     
-    Object big_box;
-    big_box.pos.x = 800;
-    big_box.rect_width = 160;
-    big_box.rect_height = 80;
-    big_box.sprite = LoadTexture("sprites/big_box.png");
-
-
+    Object box2;
+    box2.pos.x = center.x + 500;
+    box2.pos.y = 720;
+    box2.sprite = box.sprite;
+    box2.rect_width = box.rect_width;
+    box2.rect_height = box.rect_height;
+    box2.Move_left();
+    
     Floating_Object bullet;
     int click_x = GetMouseX();
     int click_y = GetMouseY();
@@ -66,7 +59,7 @@ bool run_level2() {
     bool gun_follow_player = true;
     Rectangle bulletRect = {bullet.pos.x - 20, bullet.pos.y - 20, 60, 60};
     bool shot_fired = false;
-    bool gun_disabled = true;
+    bool gun_disabled = false;
     Rectangle ground = {0, 800, 1600, 100};
 
     // Main game loop
@@ -74,52 +67,64 @@ bool run_level2() {
         HideCursor();
 
         // Check Key inputs and move player
-        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-            player.right = true;
-            player.left = false;
-        } else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
+        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) 
+        {
+                player.right = true;
+                player.left = false;
+         } 
+         else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) 
+         {
             player.left = true;
             player.right = false;
-        } else {
+         } 
+         else 
+         {
             player.left = false;
             player.right = false;
-        }
+         }
 
-        if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
-            if (!player.block_jump) {
+         if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) 
+         {
+           if (!player.block_jump) 
+           {
                 if (player.is_on_floor) player.is_jumping = true;
                 player.block_jump = true;
                 player.is_on_floor = false;
                 player.y_before_jump = player.pos.y;
-            }
-        }
+           }
+          }
 
-        if (WindowShouldClose()) run = false;
+        if (WindowShouldClose()) return false;
 
         // Move player 
         if (player.right) player.pos.x += player.speed;
         if (player.left) player.pos.x -= player.speed;
 
         // Update Rectangles
-        player.Update_Rect();
-        bullet.Update_Rect(50, 50);
+        box2.speed = box.speed;
+        box.Fall(ground);
+        box.Update_Position();
         box.Update_Rect();
-        big_box.Update_Rect();
-        pickable_gun.Update_Rect();
+        
+        box2.Fall(ground);
+        box2.Update_Position();
+        box2.Update_Rect();
+        
+        player.Update_Rect();
+        
+        bullet.Update_Rect(50, 50);
+        
         Rectangle clickRect = {(float)click_x - 20, (float)click_y - 20, 20, 20};
+        // check if box touched player 
+        if (box.Check_collision_with_rect(player.Rect) || box2.Check_collision_with_rect(player.Rect)) player.show = false;
 
+        // Check Borders and Ground for player
         if (CheckCollisionRecs(player.Rect, ground)) player.is_on_floor = true;
         else player.is_on_floor = false;
 
         if (player.pos.x <= 10) player.pos.x = 10;
-        if (player.pos.x >= window.width - 100)
-        {
-            if (autorise_exit)
-            {
-                run = false;
-            }
-            player.pos.x = window.width - 100;
-        }
+        if (player.pos.x >= window.width - 100) player.pos.x = window.width - 100;
+        if (player.pos.x >= window.width - 100 && autorise_exit) run = false;
         if (!player.is_on_floor && !player.is_jumping) player.fall = true;
         if (player.is_jumping) player.pos.y -= 25;
         if (player.y_before_jump - player.pos.y >= player.max_jump_height) player.is_jumping = false;
@@ -133,7 +138,24 @@ bool run_level2() {
         }
 
         if (player.fall) player.pos.y += 10;
-
+        if (box.pos.x <= 0)
+        {
+            box.Move_right();
+            if (box.speed < box_max_speed)
+            {
+                box.speed += 0.5;
+            }
+        }
+        if (box2.pos.x <= 0) box2.Move_right();
+        if (box.pos.x >= window.width - 100)
+        {
+            box.Move_left();
+            if (box.speed < box_max_speed)
+            {
+                box.speed += 0.5;
+            }
+        }
+        if (box2.pos.x >= window.width - 100) box2.Move_left();
         if (gun_follow_player) {
             bullet.pos = gun.pos;
             if (gun_facing_right) {
@@ -160,24 +182,12 @@ bool run_level2() {
         // Draw The Objects on the screen
         DrawRectangleRec(ground, PINK);
         player.Show();
-        if (gun_disabled) pickable_gun.Show();
-        if (show_boxes)
+        box.Show();
+        box2.Show();
+        if (!player.show)
         {
-            box.Fall(ground);
-            big_box.Fall(ground);
-            box.Show();
-            big_box.Show();
-        }
-        DrawText(tutorial_text, 0, 0, 80, WHITE);
-        if (pickable_gun.Check_collision_with_rect(player.Rect))
-        {
-            if (tutorial_finished) tutorial_text = "Well done !";
-            else
-            {
-                tutorial_text = "Shoot the boxes !";
-            }
-            show_boxes = true;
-            gun_disabled = false;
+            gun_disabled = true;
+            DrawText("Press R to retry",0,0,100,WHITE);
         }
         if (!gun_disabled) {
             Change_mouse_to_Target(target.sprite, target.pos);
@@ -216,16 +226,6 @@ bool run_level2() {
                     bullet.pos.x += bullet_x_destination;
                     bullet.pos.y += bullet_y_destination;
                 }
-                if (show_boxes)
-                {
-                    box.CheckBulletCollision(bullet.Rect,shot_fired,gun_follow_player); 
-                    big_box.CheckBulletCollision(bullet.Rect,shot_fired,gun_follow_player);
-                }
-                if (!box.show && !big_box.show)
-                {
-                    autorise_exit = true;
-                    tutorial_finished = true;
-                }
             }
         }
 
@@ -235,7 +235,7 @@ bool run_level2() {
     UnloadTexture(target.sprite);
     UnloadTexture(gun_left);
     UnloadTexture(gun_right);
-    UnloadTexture(pickable_gun.sprite);
+
     CloseWindow();
     return true;
 }

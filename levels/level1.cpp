@@ -5,7 +5,8 @@
 #include "../floating_object/floating_object.h"
 #include "../object/object.h"
 #include "../change_mouse_to_target/change_mouse_to_target.h"
-bool run_level1() {
+bool run_level1() 
+{
     bool run = true;
     Window window;
     window.width = 1600;
@@ -157,8 +158,8 @@ bool run_level1() {
             if (shot_fired) {
                 gun_follow_player = false;
                 DrawCircle(bullet.pos.x, bullet.pos.y, 20, YELLOW);
-                bullet_x_destination = (click_x - bullet.pos.x) / 20;
-                bullet_y_destination = (click_y - bullet.pos.y) / 20;
+                bullet_x_destination = (click_x - bullet.pos.x) / 15;
+                bullet_y_destination = (click_y - bullet.pos.y) / 15;
                 if (CheckCollisionRecs(bullet.Rect, clickRect)) {
                     shot_fired = false;
                     gun_follow_player = true;
