@@ -7,6 +7,7 @@
 #include "../change_mouse_to_target/change_mouse_to_target.h"
 bool run_level3() 
 {
+    bool reload_level = false;
     bool autorise_exit = false;
     bool run = true;
     int box_max_speed = 15;
@@ -93,8 +94,16 @@ bool run_level3()
                 player.y_before_jump = player.pos.y;
            }
           }
+         if (IsKeyDown(KEY_R))
+         {
+             reload_level = true;
+         }
 
-        if (WindowShouldClose()) return false;
+        if (WindowShouldClose())
+        {
+            break;
+            return false;
+        }
 
         // Move player 
         if (player.right) player.pos.x += player.speed;
@@ -188,6 +197,13 @@ bool run_level3()
         {
             gun_disabled = true;
             DrawText("Press R to retry",0,0,100,WHITE);
+        }
+        if (reload_level)
+        {
+            gun_disabled = true;
+            CloseWindow();
+            run_level3();
+            reload_level = false;
         }
         if (!gun_disabled) {
             Change_mouse_to_Target(target.sprite, target.pos);
