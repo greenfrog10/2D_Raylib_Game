@@ -1,5 +1,3 @@
-#ifndef LEVEL1_H
-#define LEVEL1_H
-bool run_level1();  
+#pragma once
 
-#endif
+bool run_level1();  
