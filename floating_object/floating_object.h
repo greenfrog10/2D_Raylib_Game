@@ -1,5 +1,4 @@
-#ifndef FLOATING_OBJECT_H
-#define FLOATING_OBJECT_H
+#pragma once
 #include "raylib.h"
 class Floating_Object {
 public:
@@ -8,5 +7,3 @@ public:
     Rectangle Rect;
     void Update_Rect(int width, int height);
 };
-
-#endif
