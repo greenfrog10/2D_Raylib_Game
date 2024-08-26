@@ -1,10 +1,10 @@
-#ifndef PLAYER_H  
-#define PLAYER_H
+#pragma once
 #include "raylib.h"
 class Player {
 public:
     Vector2 pos;
     int speed;
+    bool show = true;
     bool jumping;
     bool is_on_floor = false;
     bool fall = false;
@@ -20,4 +20,3 @@ public:
     void Respawn(Vector2 position);
     void Show();
 };
-#endif
