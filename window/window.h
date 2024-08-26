@@ -1,5 +1,4 @@
-#ifndef WINDOW_H  
-#define WINDOW_H
+#pragma once
 
 class Window {
 public:
@@ -7,4 +6,3 @@ public:
     int height;
 };
 
-#endif
