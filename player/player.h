@@ -17,6 +17,10 @@ public:
     Rectangle Rect;
     Texture2D sprite;
     void Update_Rect();
-    void Respawn(Vector2 position);
     void Show();
+    void Left();
+    void Right();
+    void Stop();
+    void Update_Position(int width,Rectangle ground);
+    void Jump();
 };
