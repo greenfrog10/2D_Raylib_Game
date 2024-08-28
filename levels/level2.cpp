@@ -74,31 +74,26 @@ bool run_level2() {
         HideCursor();
 
         // Check Key inputs and move player
-        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-            player.right = true;
-            player.left = false;
-        } else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
-            player.left = true;
-            player.right = false;
-        } else {
-            player.left = false;
-            player.right = false;
+        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) 
+        {
+            player.Right();
+        } 
+        else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) 
+        {
+            player.Left();
+        } 
+        else 
+        {
+            player.Stop();
         }
 
-        if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
-            if (!player.block_jump) {
-                if (player.is_on_floor) player.is_jumping = true;
-                player.block_jump = true;
-                player.is_on_floor = false;
-                player.y_before_jump = player.pos.y;
-            }
+        if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) 
+        {
+            player.Jump();
         }
 
         if (WindowShouldClose()) run = false;
 
-        // Move player 
-        if (player.right) player.pos.x += player.speed;
-        if (player.left) player.pos.x -= player.speed;
 
         // Update Rectangles
         player.Update_Rect();
@@ -107,33 +102,16 @@ bool run_level2() {
         big_box.Update_Rect();
         pickable_gun.Update_Rect();
         Rectangle clickRect = {(float)click_x - 20, (float)click_y - 20, 20, 20};
+        
 
-        if (CheckCollisionRecs(player.Rect, ground)) player.is_on_floor = true;
-        else player.is_on_floor = false;
-
-        if (player.pos.x <= 10) player.pos.x = 10;
         if (player.pos.x >= window.width - 100)
         {
             if (autorise_exit)
             {
                 run = false;
             }
-            player.pos.x = window.width - 100;
         }
-        if (!player.is_on_floor && !player.is_jumping) player.fall = true;
-        if (player.is_jumping) player.pos.y -= 25;
-        if (player.y_before_jump - player.pos.y >= player.max_jump_height) player.is_jumping = false;
-
-        if (player.is_on_floor) {
-            player.fall = false;
-            player.block_jump = false;
-        } else {
-            player.fall = true;
-            player.block_jump = true;
-        }
-
-        if (player.fall) player.pos.y += 10;
-
+        player.Update_Position(window.width,ground);
         if (gun_follow_player) {
             bullet.pos = gun.pos;
             if (gun_facing_right) {

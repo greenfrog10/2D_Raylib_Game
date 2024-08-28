@@ -91,29 +91,20 @@ bool run_level3()
             // Check Key inputs and move player
             if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) 
             {
-                    player.right = true;
-                    player.left = false;
+                player.Right();
             } 
             else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) 
             {
-                player.left = true;
-                player.right = false;
+                player.Left();
             } 
             else 
             {
-                player.left = false;
-                player.right = false;
+                player.Stop();
             }
 
             if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) 
             {
-                if (!player.block_jump) 
-                {
-                    if (player.is_on_floor) player.is_jumping = true;
-                    player.block_jump = true;
-                    player.is_on_floor = false;
-                    player.y_before_jump = player.pos.y;
-                }
+                player.Jump();
             }
             if (IsKeyDown(KEY_R))
             {
@@ -127,10 +118,7 @@ bool run_level3()
                 return false;
             }
 
-            // Move player 
-            if (player.right) player.pos.x += player.speed;
-            if (player.left) player.pos.x -= player.speed;
-
+            player.Update_Position(window.width,ground);
             // Update Rectangles
             box2.speed = box.speed;
             box3.speed = box.speed;
@@ -164,7 +152,6 @@ bool run_level3()
             if (CheckCollisionRecs(player.Rect, ground)) player.is_on_floor = true;
             else player.is_on_floor = false;
 
-            if (player.pos.x <= 10) player.pos.x = 10;
             if (player.pos.x >= window.width - 100)
             {
                 if (autorise_exit)
@@ -172,22 +159,7 @@ bool run_level3()
                     run = false;
                     break;
                 }              
-                player.pos.x = window.width - 100;
             }
-            if (player.pos.x >= window.width - 100 && autorise_exit) run = false;
-            if (!player.is_on_floor && !player.is_jumping) player.fall = true;
-            if (player.is_jumping) player.pos.y -= 30;
-            if (player.y_before_jump - player.pos.y >= player.max_jump_height) player.is_jumping = false;
-    
-            if (player.is_on_floor) {
-                player.fall = false;
-                player.block_jump = false;
-            } else {
-                player.fall = true;
-                player.block_jump = true;
-            }
-
-            if (player.fall) player.pos.y += 10;
             if (gun_follow_player) {
                 bullet.pos = gun.pos;
                 if (gun_facing_right) {
