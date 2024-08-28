@@ -5,7 +5,6 @@
 #include <iostream>
 int main() 
 {
-    /*
     if(run_level1())
     {
         if(run_level2())
@@ -13,7 +12,4 @@ int main()
             run_level3();
         }
     }
-    */
-    run_level3();
-    return 0;
 }
