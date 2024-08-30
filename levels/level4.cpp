@@ -1,30 +1,31 @@
 #include "raylib.h"
-#include "level3.h"
+#include <stdio.h>
+#include "level4.h"
 #include "../window/window.h"
 #include "../player/player.h"
 #include "../floating_object/floating_object.h"
 #include "../object/object.h"
 #include "../change_mouse_to_target/change_mouse_to_target.h"
 
-bool run_level3() 
+bool run_level4() 
 {
     bool reload_level = false;
-    bool autorise_exit = true;
+    bool autorise_exit = false;
     bool run = true;
-    char* text = "Quick jump these boxes can kill you !";
+    double times_box_bounced_at_max_speed = 0;
     while (run)
     {
         reload_level = false;
         Window window;
         window.width = 1600;
         window.height = 900;
-        InitWindow(window.width, window.height, "level 3");
+        InitWindow(window.width, window.height, "level 4");
         Vector2 center{window.width / 2, window.height / 2};
 
         Player player;
         player.speed = 15;
         SetTargetFPS(60);
-        player.pos.x = 0;
+        player.pos.x = center.x;
         player.pos.y = 500;
         player.sprite = LoadTexture("sprites/player.png");
 
@@ -42,36 +43,20 @@ bool run_level3()
 
         Object box;
         box.speed = 10;
-        box.pos.x = center.x;
+        box.pos.x = 1479;
         box.pos.y = 720;
         box.sprite = LoadTexture("sprites/dmg_box.png");
         box.rect_width = 121;
         box.rect_height = 115;
-        box.Move_left();
 
         Object box2;
-        box2.pos.x = box.pos.x + 500;
+        box2.speed = box.speed;
+        box2.pos.x = 0;
         box2.pos.y = 720;
         box2.sprite = box.sprite;
         box2.rect_width = box.rect_width;
         box2.rect_height = box.rect_height;
-        box2.Move_left();
         
-        Object box3;
-        box3.pos.x = box2.pos.x + 500;
-        box3.pos.y = 720;
-        box3.sprite = box.sprite;
-        box3.rect_width = box.rect_width;
-        box3.rect_height = box.rect_height;
-        box3.Move_left();
-        
-        Object box4;
-        box4.pos.x = box3.pos.x + 500;
-        box4.pos.y = 720;
-        box4.sprite = box.sprite;
-        box4.rect_width = box.rect_width;
-        box4.rect_height = box.rect_height;
-        box4.Move_left();
 
         Floating_Object bullet;
         int click_x = GetMouseX();
@@ -113,16 +98,13 @@ bool run_level3()
 
             if (WindowShouldClose())
             {
-                CloseWindow();
+                run = false;
                 break;
                 return false;
             }
 
             player.Update_Position(window.width,ground);
             // Update Rectangles
-            box2.speed = box.speed;
-            box3.speed = box.speed;
-            box4.speed = box.speed;
             box.Fall(ground);
             box.Update_Position();
             box.Update_Rect();
@@ -131,14 +113,6 @@ bool run_level3()
             box2.Update_Position();
             box2.Update_Rect();
             
-            box3.Fall(ground);
-            box3.Update_Position();
-            box3.Update_Rect();
-            
-            box4.Fall(ground);
-            box4.Update_Position();
-            box4.Update_Rect();
-            
             player.Update_Rect();
             
             bullet.Update_Rect(50, 50);
@@ -146,7 +120,6 @@ bool run_level3()
             Rectangle clickRect = {(float)click_x - 20, (float)click_y - 20, 20, 20};
             // check if box touched player 
             if (box.Check_collision_with_rect(player.Rect) || box2.Check_collision_with_rect(player.Rect)) player.show = false;
-            if (box3.Check_collision_with_rect(player.Rect)) player.show = false;
 
             // Check Borders and Ground for player
             if (CheckCollisionRecs(player.Rect, ground)) player.is_on_floor = true;
@@ -187,13 +160,10 @@ bool run_level3()
             player.Show();
             box.Show();
             box2.Show();
-            box3.Show();
-            box4.Show();
-            DrawText(text,0,0,80,WHITE);
             if (!player.show)
             {
                 gun_disabled = true;
-                text = "Press R to retry";
+                DrawText("Press R to retry",0,0,80,WHITE);
             }
             if (!gun_disabled) {
                 Change_mouse_to_Target(target.sprite, target.pos);
@@ -245,7 +215,7 @@ bool run_level3()
         UnloadTexture(box.sprite);
 
         CloseWindow();
-        text = "Quick jump these boxes can kill you !";
+        double times_box_bounced_at_max_speed = 0;
     }
 
     return true;
