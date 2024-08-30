@@ -98,7 +98,7 @@ bool run_level4()
 
             if (WindowShouldClose())
             {
-                run = false;
+                CloseWindow();
                 break;
                 return false;
             }
