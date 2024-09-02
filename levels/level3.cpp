@@ -8,12 +8,12 @@
 
 bool run_level3() 
 {
-    bool reload_level = false;
-    bool autorise_exit = true;
     bool run = true;
-    char* text = "Quick jump these boxes can kill you !";
     while (run)
     {
+        bool reload_level = false;
+        bool autorise_exit = true;
+        char* text = "Quick jump these boxes can kill you !";
         reload_level = false;
         Window window;
         window.width = 1600;
@@ -87,24 +87,25 @@ bool run_level3()
         while (!reload_level)
         {
             HideCursor();
+            if (player.alive)
+            {
+                if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) 
+                {
+                    player.Right();
+                } 
+                else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) 
+                {
+                    player.Left();
+                } 
+                else 
+                {
+                    player.Stop();
+                }
 
-            // Check Key inputs and move player
-            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) 
-            {
-                player.Right();
-            } 
-            else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) 
-            {
-                player.Left();
-            } 
-            else 
-            {
-                player.Stop();
-            }
-
-            if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) 
-            {
-                player.Jump();
+                if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) 
+                {
+                    player.Jump();
+                }
             }
             if (IsKeyDown(KEY_R))
             {
@@ -145,8 +146,8 @@ bool run_level3()
             
             Rectangle clickRect = {(float)click_x - 20, (float)click_y - 20, 20, 20};
             // check if box touched player 
-            if (box.Check_collision_with_rect(player.Rect) || box2.Check_collision_with_rect(player.Rect)) player.show = false;
-            if (box3.Check_collision_with_rect(player.Rect)) player.show = false;
+            if (box.Check_collision_with_rect(player.Rect) || box2.Check_collision_with_rect(player.Rect)) player.alive = false;
+            if (box3.Check_collision_with_rect(player.Rect)) player.alive = false;
 
             // Check Borders and Ground for player
             if (CheckCollisionRecs(player.Rect, ground)) player.is_on_floor = true;
@@ -190,9 +191,14 @@ bool run_level3()
             box3.Show();
             box4.Show();
             DrawText(text,0,0,80,WHITE);
-            if (!player.show)
+            if (!player.alive)
             {
+                player.show = false;
                 gun_disabled = true;
+                box.Stop(box.move_left);
+                box2.Stop(box2.move_left);
+                box3.Stop(box3.move_left);
+                box4.Stop(box4.move_left);
                 text = "Press R to retry";
             }
             if (!gun_disabled) {
@@ -245,7 +251,6 @@ bool run_level3()
         UnloadTexture(box.sprite);
 
         CloseWindow();
-        text = "Quick jump these boxes can kill you !";
     }
 
     return true;

@@ -6,6 +6,6 @@
 #include <iostream>
 int main() 
 {
-    // if(run_level1()) if(run_level2()) if(run_level3())  run_level4();
-    run_level4();
+   // if(run_level1()) if(run_level2()) if(run_level3())  run_level4();
+    run_level3();
 }

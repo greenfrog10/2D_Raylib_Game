@@ -4,6 +4,7 @@ class Player {
 public:
     Vector2 pos;
     int speed;
+    bool alive = true;
     bool show = true;
     bool jumping;
     bool is_on_floor = false;
@@ -13,7 +14,7 @@ public:
     bool left = false;
     bool right = false;
     int y_before_jump = 0;
-    int max_jump_height = 270;
+    int max_jump_height = 280;
     Rectangle Rect;
     Texture2D sprite;
     void Update_Rect();

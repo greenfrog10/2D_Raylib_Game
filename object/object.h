@@ -10,6 +10,7 @@ public:
     bool show = true;
     bool move_right = false;
     bool move_left = false;
+    bool move_up = false;
     int rect_width;
     int rect_height;
     Rectangle Rect = {0, 0, rect_width, rect_height};   
@@ -20,5 +21,7 @@ public:
     bool Check_collision_with_rect(Rectangle rect);
     void Move_right();
     void Move_left();
+    void Move_Up();
+    void Stop(bool &move);
     void Update_Position();
 };
