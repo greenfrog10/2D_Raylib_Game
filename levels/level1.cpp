@@ -17,7 +17,9 @@ bool run_level1()
     SetTargetFPS(60);
     player.pos.x = 0;
     player.pos.y = 500;
-    player.sprite = LoadTexture("sprites/player.png");
+    player.default_sprite = LoadTexture("sprites/player.png");
+    player.sprite_left = LoadTexture("sprites/player_left.png");
+    player.sprite_right = LoadTexture("sprites/player_right.png");
     
     Rectangle ground = {0, 800, 1600, 100};
 
@@ -25,7 +27,6 @@ bool run_level1()
     while (run) {
         HideCursor();
 
-        // Check Key inputs and move player
         if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) 
         {
             player.Right();
@@ -65,7 +66,9 @@ bool run_level1()
 
         EndDrawing();
     }
-    UnloadTexture(player.sprite);
+    UnloadTexture(player.default_sprite);
+    UnloadTexture(player.sprite_left);
+    UnloadTexture(player.sprite_right);
 
     CloseWindow();
     return true;

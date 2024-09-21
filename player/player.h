@@ -16,6 +16,9 @@ public:
     int y_before_jump = 0;
     int max_jump_height = 280;
     Rectangle Rect;
+    Texture2D default_sprite;
+    Texture2D sprite_left;
+    Texture2D sprite_right;
     Texture2D sprite;
     void Update_Rect();
     void Show();

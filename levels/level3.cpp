@@ -28,7 +28,9 @@ bool run_level3()
         SetTargetFPS(60);
         player.pos.x = center.x;
         player.pos.y = 500;
-        player.sprite = LoadTexture("sprites/player.png");
+        player.default_sprite = LoadTexture("sprites/player.png");
+        player.sprite_left = LoadTexture("sprites/player_left.png");
+        player.sprite_right = LoadTexture("sprites/player_right.png");
 
         Object box;
         box.speed = 10;
@@ -165,7 +167,9 @@ bool run_level3()
             EndDrawing();
         }
 
-        UnloadTexture(player.sprite);
+        UnloadTexture(player.default_sprite);
+        UnloadTexture(player.sprite_left);
+        UnloadTexture(player.sprite_right);
         UnloadTexture(box.sprite);
 
         CloseWindow();

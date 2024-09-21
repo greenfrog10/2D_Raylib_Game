@@ -14,16 +14,19 @@ void Player::Left()
 {
     left = true;
     right = false;
+    sprite = sprite_left;
 }
 void Player::Right()
 {
     right = true;
     left = false;
+    sprite = sprite_right;
 }
 void Player::Stop()
 {
     right = false;
     left = false;
+    sprite = default_sprite;
 }
 void Player::Update_Position(int width, Rectangle ground)
 {
