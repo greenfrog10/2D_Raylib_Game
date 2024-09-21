@@ -9,9 +9,10 @@ bool run_level3()
     bool run = true;
     while (run)
     {
-        bool make_objects_fall = true;
+        bool make_object_bounce = false;
         bool attack_1 = true;
         bool attack_2 = false;
+        bool attack_3 = false;
         bool reload_level = false;
         bool autorise_exit = false;
         int times_box_bounced = 0;
@@ -22,7 +23,9 @@ bool run_level3()
         window.height = 900;
         InitWindow(window.width, window.height, "level 3");
         Vector2 center{window.width / 2, window.height / 2};
-
+        
+        Rectangle ground = {0, 800, 3000, 100};
+        
         Player player;
         player.speed = 15;
         SetTargetFPS(60);
@@ -40,6 +43,7 @@ bool run_level3()
         box.rect_width = 121;
         box.rect_height = 115;
         box.Move_right();
+        box.Fall(ground);
 
         Object box2;
         box2.speed = box.speed;
@@ -49,9 +53,9 @@ bool run_level3()
         box2.rect_width = box.rect_width;
         box2.rect_height = box.rect_height;
         box2.Move_left();
+        box2.Fall(ground);
         
 
-        Rectangle ground = {0, 800, 3000, 100};
         // Main game loop
         while (!reload_level)
         {
@@ -107,19 +111,19 @@ bool run_level3()
             }
             if (attack_2)
             {
-                make_objects_fall = false;
-                box2.pos.y -= 10;
-                box.pos.y -= 10;
+                box.fall = false;
+                box2.fall = false;
+                box2.Move_Up();
+                box.Move_Up();
                 if(box.pos.y < -box.rect_height)
                 {
-                    box.pos.y = -box.rect_height;
-                }
-                if (box2.pos.y < -box2.rect_height)
-                {
-                    box2.pos.y = -box2.rect_height;
+                    box.move_up = false;
+                    box2.move_up = false;
+                    attack_2 = false;
+                    attack_3 = true;
                 }
             }
-            if (make_objects_fall)
+            if (attack_3)
             {
                 box.Fall(ground);
                 box2.Fall(ground);
