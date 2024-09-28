@@ -58,4 +58,6 @@ void Object::Update_Position()
     {
         pos.x -= speed;
     }
+    if (move_up)
+        pos.y -= speed;
 }

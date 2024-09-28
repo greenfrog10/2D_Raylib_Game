@@ -9,7 +9,7 @@ bool run_level3()
     bool run = true;
     while (run)
     {
-        bool make_object_bounce = false;
+        char* current_attack = "No Attacks";
         bool attack_1 = true;
         bool attack_2 = false;
         bool attack_3 = false;
@@ -93,40 +93,51 @@ bool run_level3()
 
             player.Update_Position(window.width,ground);
             // Update Rectangles
-            if(box.pos.x > 1479 && attack_1)
+            if (attack_1)
             {
-                box.Stop(box.move_right);
-                times_box_bounced += 1;
-            }
-            if(box2.pos.x < 0  && attack_1)
-            {
-                box2.Stop(box2.move_left); 
-                times_box_bounced += 1;
-            }
-            if (times_box_bounced == 2)
-            {
-                attack_1 = false;
-                attack_2 = true;
-                times_box_bounced = 0;
+                current_attack = "Attack 1";
+                if(box.pos.x > 1479)
+                {
+                    box.Stop(box.move_right);
+                    times_box_bounced += 1;
+                }
+                if(box2.pos.x < 0)
+                {
+                    box2.Stop(box2.move_left); 
+                    times_box_bounced += 1;
+                }
+                if (times_box_bounced == 2)
+                {
+                    attack_1 = false;
+                    attack_2 = true;
+                    times_box_bounced = 0;
+                }
             }
             if (attack_2)
             {
-                box.fall = false;
-                box2.fall = false;
-                box2.Move_Up();
-                box.Move_Up();
-                if(box.pos.y < -box.rect_height)
+                current_attack = "Attack 2";
+                if (box.pos.y > 550)
                 {
-                    box.move_up = false;
-                    box2.move_up = false;
-                    attack_2 = false;
-                    attack_3 = true;
+                    box.Move_Up();
+                }
+                else
+                {
+                    box.Stop(box.move_up);
+                    box.Move_left();
+                    box2.Move_right();
+                    if (box.pos.x < 0) box.Stop(box.move_left);
+                    if (box2.pos.x > 1479) box2.Stop(box2.move_right);
+                    if (!box.move_left && !box2.move_right)
+                    {
+                        attack_2 = false;
+                        attack_3 = true;
+                    }                        
                 }
             }
             if (attack_3)
             {
+                current_attack = "Attack 3";
                 box.Fall(ground);
-                box2.Fall(ground);
             }
             box.Update_Position();
             box.Update_Rect();
@@ -140,6 +151,7 @@ bool run_level3()
             box.Show();
             box2.Show();
             player.Show();
+            DrawText(current_attack,0,200,80,WHITE);
             // check if box touched player 
             if (box.Check_collision_with_rect(player.Rect) || box2.Check_collision_with_rect(player.Rect)) player.alive = false;
 
